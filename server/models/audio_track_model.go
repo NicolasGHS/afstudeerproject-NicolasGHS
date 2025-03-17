@@ -13,5 +13,6 @@ type AudioTrack struct {
 	TrackId     string             `json:"trackId,omitempty" validate:"required"`
 	TrackUrl    string             `json:"trackUrl,omitempty" validate:"required"`
 	Instrument  string             `json:"instrument,omitempty" validate:"required"`
+	Status      string             `json:"status,omitempty" bson:"status,omitempty"` // "pending", "accepted", "rejected"
 	CreatedAt   time.Time          `json:"createdAt,omitempty" bson:"createdAt,omitempty"`
 }

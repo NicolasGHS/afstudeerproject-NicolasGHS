@@ -128,3 +128,33 @@ func GetAllAudioTracks(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.AudioTrackResponse{Status: http.StatusOK, Message: "success", Data: &echo.Map{"data": audioTracks}})
 
 }
+
+
+// func AcceptAudioTrack(w http.ResponseWriter, r*http.Request) {
+// 	id := mux.Vars(r)["id"]
+// 	ObjectID, _ := primitive.ObjectIDFromHex(id)
+
+// 	update := bson.M{"$set": bson.M{"status": "accepted"}}
+// 	_, err := audioTrackCollection.UpdateOne(context.TODO(), bson.M{"_id": ObjectId}, update)
+
+// 	if err != nil {
+// 		http.Error(w, "Failed to accept request", http.StatusInternalServerError)
+//         return
+// 	}
+
+// 	w.WriteHeader(http.StatusOK)
+// }
+
+// func RejectAudioTrack(w http.ResponseWriter, r *http.Request) {
+//     id := mux.Vars(r)["id"]
+//     objectId, _ := primitive.ObjectIDFromHex(id)
+    
+//     update := bson.M{"$set": bson.M{"status": "rejected"}}
+//     _, err := audioTrackCollection.UpdateOne(context.TODO(), bson.M{"_id": objectId}, update)
+
+//     if err != nil {
+//         http.Error(w, "Failed to reject request", http.StatusInternalServerError)
+//         return
+//     }
+//     w.WriteHeader(http.StatusOK)
+// }

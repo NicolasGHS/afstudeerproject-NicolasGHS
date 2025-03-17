@@ -168,7 +168,10 @@ func GetAudioTrackByTrackId(c echo.Context) error {
 
 	// Zoek naar alle audioTracks met de juiste trackId
 	var audioTracks []models.AudioTrack
-	cursor, err := audioTrackCollection.Find(ctx, bson.M{"trackid": trackId})
+	cursor, err := audioTrackCollection.Find(ctx, bson.M{
+		"trackid": trackId,
+		"status": "accepted",
+})
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.TrackResponse{
 			Status:  http.StatusInternalServerError,
