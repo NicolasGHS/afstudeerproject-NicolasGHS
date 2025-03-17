@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "prettier": "^3.5.3"
+  },
+  "dependencies": {
+    "wavesurfer.js": "^7.9.1"
+  }
+}
