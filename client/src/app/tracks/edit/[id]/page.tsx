@@ -100,7 +100,6 @@ const EditTrack = () => {
           contributor: user?.id,
           trackId: id,
           trackUrl: fileUrl,
-          status: "pending",
           instrument: data.instrument,
         }),
       });

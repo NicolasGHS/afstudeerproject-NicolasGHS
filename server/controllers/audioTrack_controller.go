@@ -6,9 +6,9 @@ import (
 	"syncopate/configs"
 	"syncopate/models"
 	"syncopate/responses"
+	"syncopate/websocket"
 	"time"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,7 +16,8 @@ import (
 )
 
 var audioTrackCollection *mongo.Collection = configs.GetCollection(configs.DB, "audioTracks")
-var validateAudioTrack = validator.New()
+
+// var validateAudioTrack = validator.New()
 
 func CreateAudioTrack(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -39,6 +40,7 @@ func CreateAudioTrack(c echo.Context) error {
 		Contributor: audioTrack.Contributor,
 		TrackId:     audioTrack.TrackId,
 		TrackUrl:    audioTrack.TrackUrl,
+		Status:      "pending",
 		Instrument:  audioTrack.Instrument,
 	}
 
@@ -46,6 +48,20 @@ func CreateAudioTrack(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.AudioTrackResponse{Status: http.StatusInternalServerError, Message: "error", Data: &echo.Map{"data": err.Error()}})
 	}
+
+	var parentTrack models.Track
+	err = trackCollection.FindOne(ctx, bson.M{"id": audioTrack.TrackId}).Decode(&parentTrack)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, responses.AudioTrackResponse{
+			Status:  http.StatusNotFound,
+			Message: "error",
+			Data:    &echo.Map{"data": "Parent track not found"},
+		})
+	}
+
+	message := "🎵 Je hebt een nieuw verzoek voor een AudioTrack: " + audioTrack.Name
+	websocket.NotifyUser(parentTrack.UserId, message)
 
 	return c.JSON(http.StatusCreated, responses.AudioTrackResponse{Status: http.StatusCreated, Message: "success", Data: &echo.Map{"data": result}})
 
@@ -129,7 +145,6 @@ func GetAllAudioTracks(c echo.Context) error {
 
 }
 
-
 // func AcceptAudioTrack(w http.ResponseWriter, r*http.Request) {
 // 	id := mux.Vars(r)["id"]
 // 	ObjectID, _ := primitive.ObjectIDFromHex(id)
@@ -148,7 +163,7 @@ func GetAllAudioTracks(c echo.Context) error {
 // func RejectAudioTrack(w http.ResponseWriter, r *http.Request) {
 //     id := mux.Vars(r)["id"]
 //     objectId, _ := primitive.ObjectIDFromHex(id)
-    
+
 //     update := bson.M{"$set": bson.M{"status": "rejected"}}
 //     _, err := audioTrackCollection.UpdateOne(context.TODO(), bson.M{"_id": objectId}, update)
 
