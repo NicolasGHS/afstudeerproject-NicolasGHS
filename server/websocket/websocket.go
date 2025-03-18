@@ -54,6 +54,10 @@ func HandleWebSocket(c echo.Context) error {
 
 // Functie om notificaties te sturen
 func NotifyUser(userId, message string) {
+	fmt.Println("Versturen bericht naar:", userId, "Bericht:", message) // <-- Toegevoegd
+
+	message = "🎵 Testbericht vanuit de WebSocket-server!"
+
 	mutex.Lock()
 	conn, exists := clients[userId]
 	mutex.Unlock()
@@ -61,7 +65,11 @@ func NotifyUser(userId, message string) {
 	if exists {
 		err := conn.WriteMessage(websocket.TextMessage, []byte(message))
 		if err != nil {
-			fmt.Println("Error sending message:", err)
+			fmt.Println("Error bij verzenden:", err)
+		} else {
+			fmt.Println("Bericht succesvol verzonden aan", userId)
 		}
+	} else {
+		fmt.Println("Geen actieve WebSocket-verbinding voor", userId)
 	}
 }

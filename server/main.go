@@ -29,6 +29,7 @@ func main() {
 	routes.TrackRoute(e)
 	routes.InstrumentRoute(e)
 	routes.AudioTrackRoute(e)
+	routes.SetupRoutes(e)
 
 	e.Logger.Fatal(e.Start(":8000"))
 }

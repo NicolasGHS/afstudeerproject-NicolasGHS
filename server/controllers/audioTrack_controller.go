@@ -49,8 +49,17 @@ func CreateAudioTrack(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responses.AudioTrackResponse{Status: http.StatusInternalServerError, Message: "error", Data: &echo.Map{"data": err.Error()}})
 	}
 
+	trackID, err := primitive.ObjectIDFromHex(audioTrack.TrackId)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, responses.AudioTrackResponse{
+			Status:  http.StatusBadRequest,
+			Message: "error",
+			Data:    &echo.Map{"data": "Invalid TrackId format"},
+		})
+	}
+
 	var parentTrack models.Track
-	err = trackCollection.FindOne(ctx, bson.M{"id": audioTrack.TrackId}).Decode(&parentTrack)
+	err = trackCollection.FindOne(ctx, bson.M{"id": trackID}).Decode(&parentTrack)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, responses.AudioTrackResponse{
