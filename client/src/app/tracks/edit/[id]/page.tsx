@@ -9,6 +9,7 @@ import { getUser } from "@/lib/users/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
+import { Pause, Play } from 'lucide-react';
 import {
   Form,
   FormField,
@@ -153,7 +154,7 @@ const EditTrack = () => {
     <>
       {audioTracks.length > 0 && (
         <Button onClick={togglePlayAll} className="mt-4">
-          {isPlaying ? "Pause All" : "Play All"}
+          {isPlaying ? <Pause /> : <Play />}
         </Button>
       )}
       {audioTracks.length > 0 ? (
