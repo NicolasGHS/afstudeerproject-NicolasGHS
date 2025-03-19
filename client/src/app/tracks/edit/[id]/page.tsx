@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { Pause, Play } from 'lucide-react';
+import { useRouter } from "next/navigation";
 import {
   Form,
   FormField,
@@ -50,6 +51,7 @@ const EditTrack = () => {
   const { id } = useParams();
   const [players, setPlayers] = useState<WaveSurfer[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const router = useRouter();
 
   const togglePlayAll = () => {
     if (isPlaying) {
@@ -113,6 +115,8 @@ const EditTrack = () => {
 
       console.log("AudioTrack added successfully!");
       form.reset();
+
+      router.push(`/tracks/${id}`);
 
       // Herlaad de audiotracks
       const updatedTracks = await getAudioTracksById(id);
