@@ -1,15 +1,16 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/lJwnQlHSEBA
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
+"use client";
+
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Bell } from 'lucide-react';
+import { useWebSocket } from "../../contexts/WebSocketContext";
 
 export default function Navbar() {
+  const { messages } = useWebSocket();
+
+
   return (
     <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-6">
       <Sheet>
@@ -71,7 +72,15 @@ export default function Navbar() {
                 Notifications
               </SheetTitle>
               <SheetDescription>
-
+              {messages.length > 0 ? (
+                  <ul className="mt-4 space-y-2">
+                    {messages.map((msg, index) => (
+                      <li key={index} className="p-2 bg-gray-100 rounded">{msg}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 mt-4">Geen meldingen</p>
+                )}
               </SheetDescription>
             </SheetHeader>
           </SheetContent>
