@@ -8,7 +8,7 @@ import { Bell } from 'lucide-react';
 import { useWebSocket } from "../../contexts/WebSocketContext";
 
 export default function Navbar() {
-  const { messages } = useWebSocket();
+  const { messages, removeMessage } = useWebSocket();
 
 
   return (
@@ -75,7 +75,12 @@ export default function Navbar() {
               {messages.length > 0 ? (
                   <ul className="mt-4 space-y-2">
                     {messages.map((msg, index) => (
-                      <li key={index} className="p-2 bg-gray-100 rounded">{msg}</li>
+                      <li key={index} className="p-2 bg-gray-100 rounded">
+                        {msg}
+                        <button onClick={() => removeMessage(index)} className="text-red-500">
+                          x
+                        </button>
+                      </li>
                     ))}
                   </ul>
                 ) : (
