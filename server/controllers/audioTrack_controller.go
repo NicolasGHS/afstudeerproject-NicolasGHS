@@ -166,31 +166,44 @@ func GetAllAudioTracks(c echo.Context) error {
 
 }
 
-// func AcceptAudioTrack(w http.ResponseWriter, r*http.Request) {
-// 	id := mux.Vars(r)["id"]
-// 	ObjectID, _ := primitive.ObjectIDFromHex(id)
+func AcceptAudioTracks(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-// 	update := bson.M{"$set": bson.M{"status": "accepted"}}
-// 	_, err := audioTrackCollection.UpdateOne(context.TODO(), bson.M{"_id": ObjectId}, update)
+	// Verkrijg de lijst van track IDs (bijv. van de frontend) die geaccepteerd moeten worden
+	var requestBody struct {
+		TrackIds []string `json:"trackIds"`
+	}
 
-// 	if err != nil {
-// 		http.Error(w, "Failed to accept request", http.StatusInternalServerError)
-//         return
-// 	}
+	if err := c.Bind(&requestBody); err != nil {
+		return c.JSON(http.StatusBadRequest, responses.AudioTrackResponse{Status: http.StatusBadRequest, Message: "error", Data: &echo.Map{"data": err.Error()}})
+	}
 
-// 	w.WriteHeader(http.StatusOK)
-// }
+	// Zet de status van elke audio track op 'accepted'
+	for _, trackId := range requestBody.TrackIds {
+		trackObjectId, err := primitive.ObjectIDFromHex(trackId)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, responses.AudioTrackResponse{
+				Status:  http.StatusBadRequest,
+				Message: "error",
+				Data:    &echo.Map{"data": "Invalid TrackId format"},
+			})
+		}
 
-// func RejectAudioTrack(w http.ResponseWriter, r *http.Request) {
-//     id := mux.Vars(r)["id"]
-//     objectId, _ := primitive.ObjectIDFromHex(id)
+		update := bson.M{"$set": bson.M{"status": "accepted"}}
+		_, err = audioTrackCollection.UpdateOne(ctx, bson.M{"id": trackObjectId}, update)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.AudioTrackResponse{
+				Status:  http.StatusInternalServerError,
+				Message: "error",
+				Data:    &echo.Map{"data": err.Error()},
+			})
+		}
+	}
 
-//     update := bson.M{"$set": bson.M{"status": "rejected"}}
-//     _, err := audioTrackCollection.UpdateOne(context.TODO(), bson.M{"_id": objectId}, update)
-
-//     if err != nil {
-//         http.Error(w, "Failed to reject request", http.StatusInternalServerError)
-//         return
-//     }
-//     w.WriteHeader(http.StatusOK)
-// }
+	return c.JSON(http.StatusOK, responses.AudioTrackResponse{
+		Status:  http.StatusOK,
+		Message: "success",
+		Data:    &echo.Map{"data": "Tracks successfully accepted"},
+	})
+}

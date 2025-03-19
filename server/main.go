@@ -50,7 +50,7 @@ func main() {
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:3000", "https://127.0.0.1:3000"},
-		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodDelete},
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
 	}))
 
 	e.GET("/", func(c echo.Context) error {
