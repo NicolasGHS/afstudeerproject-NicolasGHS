@@ -72,13 +72,13 @@ func CreateAudioTrack(c echo.Context) error {
 	}
 
 	messageData := map[string]string{
-		"message": "🎵 Je hebt een nieuw verzoek voor een AudioTrack!",
-		"trackId": newAudioTrack.Id.Hex(), // Stuur de ID van de aangemaakte track
+		"message": "Je hebt een nieuw verzoek voor een AudioTrack!",
+		"trackId": parentTrack.Id.Hex(), // Stuur de ID van de aangemaakte track
 	}
 
 	jsonMessage, err := json.Marshal(messageData)
 	if err != nil {
-		log.Println("❌ Error bij JSON conversie:", err)
+		log.Println("Error bij JSON conversie:", err)
 		return err
 	}
 

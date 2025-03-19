@@ -151,7 +151,7 @@ func GetAllTracks(c echo.Context) error {
 
 }
 
-func GetAudioTrackByTrackId(c echo.Context) error {
+func GetAcceptedAudioTrackByTrackId(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	trackId := c.Param("trackId")
 	defer cancel()
@@ -170,8 +170,8 @@ func GetAudioTrackByTrackId(c echo.Context) error {
 	var audioTracks []models.AudioTrack
 	cursor, err := audioTrackCollection.Find(ctx, bson.M{
 		"trackid": trackId,
-		"status": "accepted",
-})
+		"status":  "accepted",
+	})
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.TrackResponse{
 			Status:  http.StatusInternalServerError,
@@ -200,4 +200,43 @@ func GetAudioTrackByTrackId(c echo.Context) error {
 		Data:    &echo.Map{"data": audioTracks},
 	})
 
+}
+
+func GetAllAudioTracksByTrackId(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	trackId := c.Param("trackId")
+	defer cancel()
+
+	var audioTracks []models.AudioTrack
+
+	// Zoek alle audiotracks met de opgegeven TrackId (zonder filtering op status)
+	cursor, err := audioTrackCollection.Find(ctx, bson.M{"trackid": trackId})
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.AudioTrackResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "error",
+			Data:    &echo.Map{"data": err.Error()},
+		})
+	}
+
+	// Itereer door de resultaten
+	defer cursor.Close(ctx)
+	for cursor.Next(ctx) {
+		var track models.AudioTrack
+		if err := cursor.Decode(&track); err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.AudioTrackResponse{
+				Status:  http.StatusInternalServerError,
+				Message: "error",
+				Data:    &echo.Map{"data": err.Error()},
+			})
+		}
+		audioTracks = append(audioTracks, track)
+	}
+
+	return c.JSON(http.StatusOK, responses.AudioTrackResponse{
+		Status:  http.StatusOK,
+		Message: "success",
+		Data:    &echo.Map{"data": audioTracks},
+	})
 }

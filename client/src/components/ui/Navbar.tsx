@@ -20,7 +20,7 @@ export default function Navbar() {
     try {
       notification = typeof notificationString === "string" ? JSON.parse(notificationString) : notificationString;
     } catch (error) {
-      console.error("❌ Fout bij het parsen van notificatie:", error);
+      console.error("Fout bij het parsen van notificatie:", error);
       router.push("/dashboard");
       return;
     }
@@ -102,7 +102,7 @@ export default function Navbar() {
                       try {
                         notification = typeof msg === "string" ? JSON.parse(msg) : msg;
                       } catch (error) {
-                        console.error("❌ Fout bij JSON parse:", error, msg);
+                        console.error("Fout bij JSON parse:", error, msg);
                         notification = { message: msg }; // Als het geen JSON is, zet het als string in een object
                       }
 

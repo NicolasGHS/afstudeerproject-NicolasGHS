@@ -31,12 +31,12 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
                   return updatedMessages;
                 });
               } catch (error) {
-                console.error("❌ Fout bij het parsen van WebSocket-bericht:", error);
+                console.error("Fout bij het parsen van WebSocket-bericht:", error);
               }
         };
 
         ws.onclose = () => {
-            console.log("❌ WebSocket connection closed");
+            console.log("WebSocket connection closed");
             setTimeout(() => {
                 const newSocket = new WebSocket(`ws://localhost:8000/ws/${userId}`);
                 newSocket.onmessage = (event) => setMessages((prev) => [...prev, event.data]);

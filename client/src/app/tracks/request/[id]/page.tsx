@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Pause, Play } from 'lucide-react';
 import { useParams } from "next/navigation";
+import { getAllAudioTracksById } from "@/lib/tracks/api";
 import { useState, useEffect } from "react";
 import WaveSurfer from "wavesurfer.js";
 import AudioTrack from "@/components/AudioTrack";
@@ -25,8 +26,18 @@ const Request = () => {
     };
 
     useEffect(() => {
+        const getAudioTracks = async () => {
+            const tracks = await getAllAudioTracksById(id);
+    
+            console.log("Tracks: ", tracks);
+    
+            setAudioTracks(tracks);
+        };
 
-    })
+        getAudioTracks();
+    }, []);
+
+    console.log("audio tracks: ", audioTracks);
     
 
     return (
