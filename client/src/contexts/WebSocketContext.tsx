@@ -1,51 +1,46 @@
-// context/WebSocketContext.tsx
+"use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from "react";
 
-// Context voor WebSocket
 const WebSocketContext = createContext<WebSocket | null>(null);
+
+export const WebSocketProvider = ({ children }: { children: React.ReactNode }) => {
+    const [socket, setSocket] = useState<WebSocket | null>(null);
+
+    useEffect(() => {
+        const userId = "67c5724248d6ae787976a326";
+        const ws = new WebSocket(`ws://localhost:8000/ws/${userId}`);
+
+        ws.onopen = () => {
+            console.log("✅ WebSocket connected");
+            setSocket(ws);
+        };
+
+        ws.onmessage = (event) => {
+            console.log("🔔 Notificatie ontvangen:", event.data);
+        };
+
+        ws.onclose = () => {
+            console.log("❌ WebSocket connection closed");
+            setSocket(null);
+            // Optioneel: probeer opnieuw te verbinden na een tijdje
+            setTimeout(() => {
+                setSocket(new WebSocket(`ws://localhost:8000/ws/${userId}`));
+            }, 3000);
+        };
+
+        return () => {
+            ws.close();
+        };
+    }, []);
+
+    return (
+        <WebSocketContext.Provider value={socket}>
+            {children}
+        </WebSocketContext.Provider>
+    );
+};
 
 export const useWebSocket = () => {
     return useContext(WebSocketContext);
-};
-
-interface WebSocketProviderProps {
-    children: React.ReactNode;
-    userId: string;
-}
-
-export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ userId, children }) => {
-    const [ws, setWs] = useState<WebSocket | null>(null);
-
-    useEffect(() => {
-        if (!userId) return; // Wacht tot userId beschikbaar is
-
-        // Maak verbinding met WebSocket server
-        const socket = new WebSocket(`ws://localhost:8000/ws?userId=${userId}`);
-
-        socket.onopen = () => {
-            console.log("WebSocket verbinding geopend voor userId:", userId);
-        };
-
-        socket.onmessage = (event) => {
-            console.log("Bericht ontvangen:", event.data);
-            // Hier kun je je notificatie- of UI logica toevoegen
-        };
-
-        socket.onerror = (error) => {
-            console.error("WebSocket fout:", error);
-        };
-
-        socket.onclose = () => {
-            console.log("WebSocket verbinding gesloten voor userId:", userId);
-        };
-
-        setWs(socket);
-
-        return () => {
-            socket.close();
-        };
-    }, [userId]);
-
-    return <WebSocketContext.Provider value={ws}>{children}</WebSocketContext.Provider>;
 };

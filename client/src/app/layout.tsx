@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/ui/Navbar";
 import PlayerBar from "@/components/PlayBar";
 import { AudioPlayerProvider } from "@/contexts/AudioPlayerContext";
+import { WebSocketProvider } from "@/contexts/WebSocketContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,18 +34,20 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <AudioPlayerProvider>
-              <Navbar />
-              {children}
-              <PlayerBar />
-            </AudioPlayerProvider>
-          </ThemeProvider>
+          <WebSocketProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+              >
+              <AudioPlayerProvider>
+                <Navbar />
+                {children}
+                <PlayerBar />
+              </AudioPlayerProvider>
+            </ThemeProvider>
+          </WebSocketProvider>
         </body>
       </html>
     </ClerkProvider>

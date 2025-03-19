@@ -6,7 +6,6 @@ import TrackList from "@/components/TrackList";
 import AddButton from "@/components/AddButton";
 import { useEffect, useState } from "react";
 import UserInitializer from "@/lib/users/UserInitializer";
-import socket from "../lib/websocket";
 
 export default function Home() {
   const [tracks, setTracks] = useState([]);
@@ -26,13 +25,6 @@ export default function Home() {
     fetchTracks();
   }, []);
 
-  useEffect(() => {
-    socket.send("Hello Server!");
-
-    return () => {
-        socket.close(); // Sluit verbinding bij unmount
-    };
-}, []);
 
   return (
     <div className="flex flex-col items-center w-full min-h-screen p-4">

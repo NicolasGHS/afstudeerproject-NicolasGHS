@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"syncopate/configs"
 	"syncopate/routes"
+	"syncopate/socket"
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -64,10 +65,33 @@ func main() {
 	routes.TrackRoute(e)
 	routes.InstrumentRoute(e)
 	routes.AudioTrackRoute(e)
-	routes.SetupRoutes(e)
+	// routes.SetupRoutes(e)
 
 	e.GET("/ws", func(c echo.Context) error {
 		handleConnections(c.Response(), c.Request())
+		return nil
+	})
+
+	e.GET("/ws/:userId", func(c echo.Context) error {
+		userId := c.Param("userId")
+		conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+		if err != nil {
+			fmt.Println("Error upgrading WebSocket:", err)
+			return err
+		}
+		defer conn.Close()
+
+		// Registreer gebruiker
+		socket.RegisterUser(userId, conn)
+
+		for {
+			_, _, err := conn.ReadMessage()
+			if err != nil {
+				fmt.Println("User disconnected:", userId)
+				socket.UnregisterUser(userId)
+				break
+			}
+		}
 		return nil
 	})
 

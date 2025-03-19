@@ -6,7 +6,7 @@ import (
 	"syncopate/configs"
 	"syncopate/models"
 	"syncopate/responses"
-	"syncopate/websocket"
+	"syncopate/socket"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -70,7 +70,7 @@ func CreateAudioTrack(c echo.Context) error {
 	}
 
 	message := "🎵 Je hebt een nieuw verzoek voor een AudioTrack: " + audioTrack.Name
-	websocket.NotifyUser(parentTrack.UserId, message)
+	socket.NotifyUser(parentTrack.UserId, message)
 
 	return c.JSON(http.StatusCreated, responses.AudioTrackResponse{Status: http.StatusCreated, Message: "success", Data: &echo.Map{"data": result}})
 
