@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"syncopate/configs"
@@ -205,5 +206,65 @@ func AcceptAudioTracks(c echo.Context) error {
 		Status:  http.StatusOK,
 		Message: "success",
 		Data:    &echo.Map{"data": "Tracks successfully accepted"},
+	})
+}
+
+func DeclineAudioTracks(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var requestBody struct {
+		TrackIds []string `json:"trackIds"`
+	}
+
+	if err := c.Bind(&requestBody); err != nil {
+		return c.JSON(http.StatusBadRequest, responses.AudioTrackResponse{
+			Status:  http.StatusBadRequest,
+			Message: "error",
+			Data:    &echo.Map{"data": err.Error()},
+		})
+	}
+
+	// Loop door alle track IDs en verwijder ze uit de database
+	for _, trackId := range requestBody.TrackIds {
+		fmt.Println("Deleting track ID:", trackId)
+
+		// Controleer of de trackId een geldig ObjectID is
+		trackObjectId, err := primitive.ObjectIDFromHex(trackId)
+		if err != nil {
+			fmt.Println("Invalid ObjectID format, using string match instead")
+			filter := bson.M{"trackId": trackId} // Gebruik string match als fallback
+			res, err := audioTrackCollection.DeleteOne(ctx, filter)
+			if err != nil {
+				fmt.Println("MongoDB DeleteOne error:", err)
+				return c.JSON(http.StatusInternalServerError, responses.AudioTrackResponse{
+					Status:  http.StatusInternalServerError,
+					Message: "error",
+					Data:    &echo.Map{"data": err.Error()},
+				})
+			}
+			fmt.Println("Documents deleted (string ID):", res.DeletedCount)
+			continue
+		}
+
+		// Verwijder met ObjectID als het geldig is
+		filter := bson.M{"id": trackObjectId}
+		res, err := audioTrackCollection.DeleteOne(ctx, filter)
+		if err != nil {
+			fmt.Println("MongoDB DeleteOne error:", err)
+			return c.JSON(http.StatusInternalServerError, responses.AudioTrackResponse{
+				Status:  http.StatusInternalServerError,
+				Message: "error",
+				Data:    &echo.Map{"data": err.Error()},
+			})
+		}
+
+		fmt.Println("Documents deleted (ObjectID):", res.DeletedCount)
+	}
+
+	return c.JSON(http.StatusOK, responses.AudioTrackResponse{
+		Status:  http.StatusOK,
+		Message: "success",
+		Data:    &echo.Map{"data": "Tracks successfully declined and deleted"},
 	})
 }

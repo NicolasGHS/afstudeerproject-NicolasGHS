@@ -14,6 +14,8 @@ const Request = () => {
     const { id } = useParams();
     const [players, setPlayers] = useState<WaveSurfer[]>([]);
     const [isPlaying, setIsPlaying] = useState(false);
+    const pendingAudioTracks = pendingTracks.filter((track) => track.status === "pending").map((track) => track.id);
+
 
     const togglePlayAll = () => {
         if (isPlaying) {
@@ -26,9 +28,8 @@ const Request = () => {
 
 
     const acceptTracks = async () => {
-        const trackIdsToAccept = pendingTracks.filter((track) => track.status === "pending").map((track) => track.id);
 
-        if (trackIdsToAccept.length === 0) {
+        if (pendingAudioTracks.length === 0) {
             console.log("No tracks pending acceptance");
             return;
         }
@@ -40,7 +41,7 @@ const Request = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    trackIds: trackIdsToAccept,
+                    trackIds: pendingAudioTracks,
                 }),
             });
 
@@ -59,6 +60,38 @@ const Request = () => {
             console.error("Error accpting tracks: ", error);
         }
     }
+
+    const declineTracks = async () => {    
+        if (pendingAudioTracks.length === 0) {
+            console.log("No pending tracks to decline");
+            return;
+        }
+    
+        try {
+            const response = await fetch("http://localhost:8000/audioTracks/decline", {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    trackIds: pendingAudioTracks,
+                }),
+            });
+    
+            if (response.ok) {
+                console.log("Tracks declined successfully");
+                // Verwijder de declined tracks uit de UI
+                setAudioTracks((prevTracks) =>
+                    prevTracks.filter((track) => track.status !== "pending")
+                );
+            } else {
+                console.error("Failed to decline tracks");
+            }
+        } catch (error) {
+            console.error("Error declining tracks: ", error);
+        }
+    };
+    
 
     useEffect(() => {
         const getAudioTracks = async () => {
@@ -98,7 +131,7 @@ const Request = () => {
                         <Button variant="default" onClick={acceptTracks}>
                             Accept
                         </Button>
-                        <Button variant="secondary">
+                        <Button variant="secondary" onClick={declineTracks}>
                             Decline
                         </Button>
                     </div>

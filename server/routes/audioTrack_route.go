@@ -12,4 +12,5 @@ func AudioTrackRoute(e *echo.Echo) {
 	e.POST("/audioTracks", controllers.CreateAudioTrack)
 	e.PUT("/audioTracks/accept", controllers.AcceptAudioTracks)
 	e.DELETE("/audioTracks/:audioTrackId", controllers.DeleteAudioTrack)
+	e.DELETE("/audioTracks/decline", controllers.DeclineAudioTracks)
 }
