@@ -6,11 +6,32 @@ import Link from "next/link";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Bell } from 'lucide-react';
 import { useWebSocket } from "../../contexts/WebSocketContext";
+import { useRouter } from "next/navigation";
+
 
 export default function Navbar() {
   const { messages, removeMessage } = useWebSocket();
+  const router = useRouter();
 
+  const handleNotificationClick = (notificationString: string, index: number) => {
+    let notification;
 
+    // ✅ Controleer of het een JSON-string is en parse alleen indien nodig
+    try {
+      notification = typeof notificationString === "string" ? JSON.parse(notificationString) : notificationString;
+    } catch (error) {
+      console.error("❌ Fout bij het parsen van notificatie:", error);
+      router.push("/dashboard");
+      return;
+    }
+
+    // ✅ Controleer of er een trackId is
+    if (notification.trackId) {
+      router.push(`/tracks/request/${notification.trackId}`);
+    } else {
+      router.push("/dashboard");
+    }
+  };
   return (
     <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-6">
       <Sheet>
@@ -72,16 +93,32 @@ export default function Navbar() {
                 Notifications
               </SheetTitle>
               <SheetDescription>
-              {messages.length > 0 ? (
+                {messages.length > 0 ? (
                   <ul className="mt-4 space-y-2">
-                    {messages.map((msg, index) => (
-                      <li key={index} className="p-2 bg-gray-100 rounded">
-                        {msg}
-                        <button onClick={() => removeMessage(index)} className="text-red-500">
-                          x
-                        </button>
-                      </li>
-                    ))}
+                    {messages.map((msg, index) => {
+                      let notification;
+
+                      // Probeer JSON te parsen, anders behandel het als een string
+                      try {
+                        notification = typeof msg === "string" ? JSON.parse(msg) : msg;
+                      } catch (error) {
+                        console.error("❌ Fout bij JSON parse:", error, msg);
+                        notification = { message: msg }; // Als het geen JSON is, zet het als string in een object
+                      }
+
+                      return (
+                        <li
+                          key={index}
+                          className="p-2 bg-gray-100 rounded"
+                          onClick={() => handleNotificationClick(notification, index)}
+                        >
+                          {notification.message} {/* ✅ Correcte weergave */}
+                          <button onClick={() => removeMessage(index)} className="text-red-500">
+                            x
+                          </button>
+                        </li>
+                      );
+                    })}
                   </ul>
                 ) : (
                   <p className="text-gray-500 mt-4">Geen meldingen</p>
@@ -89,7 +126,7 @@ export default function Navbar() {
               </SheetDescription>
             </SheetHeader>
           </SheetContent>
-          
+
         </Sheet>
         <Link
           href="/about"

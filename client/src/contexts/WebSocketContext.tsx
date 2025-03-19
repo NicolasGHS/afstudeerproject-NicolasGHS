@@ -6,7 +6,7 @@ const WebSocketContext = createContext(null);
 
 export const WebSocketProvider = ({ children }: { children: React.ReactNode }) => {
     // const [socket, setSocket] = useState<WebSocket | null>(null);
-    const [messages, setMessages] = useState<string[]>(() => {
+    const [messages, setMessages] = useState<[]>(() => {
         // 🟢 Haal berichten uit localStorage bij laden
         if (typeof window !== "undefined") {
           return JSON.parse(localStorage.getItem("notifications") || "[]");
@@ -23,15 +23,16 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         };
 
         ws.onmessage = (event) => {
-            const newMessage = event.data;
-            setMessages((prevMessages) => {
-                const updatedMessages = [...prevMessages, newMessage];
-
-                // sla berichten op in localStorage
-                localStorage.setItem("notifications", JSON.stringify(updatedMessages));
-
-                return updatedMessages;
-            });
+            try {
+                const newMessage = JSON.parse(event.data); // 🔹 Parse hier als object
+                setMessages((prevMessages) => {
+                  const updatedMessages = [...prevMessages, newMessage]; 
+                  localStorage.setItem("notifications", JSON.stringify(updatedMessages)); 
+                  return updatedMessages;
+                });
+              } catch (error) {
+                console.error("❌ Fout bij het parsen van WebSocket-bericht:", error);
+              }
         };
 
         ws.onclose = () => {
@@ -47,13 +48,15 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         };
     }, []);
 
+    console.log("message: ", messages);
+
     const removeMessage = (index: number) => {
         setMessages((prevMessages) => {
           const updatedMessages = prevMessages.filter((_, i) => i !== index);
-          localStorage.setItem("notifications", JSON.stringify(updatedMessages)); // Update localStorage
+          localStorage.setItem("notifications", JSON.stringify(updatedMessages));
           return updatedMessages;
         });
-      };
+    };
 
 
     return (

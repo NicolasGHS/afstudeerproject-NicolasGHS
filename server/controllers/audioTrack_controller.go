@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
+	"log"
 	"net/http"
 	"syncopate/configs"
 	"syncopate/models"
@@ -69,8 +71,18 @@ func CreateAudioTrack(c echo.Context) error {
 		})
 	}
 
-	message := "🎵 Je hebt een nieuw verzoek voor een AudioTrack: " + audioTrack.Name
-	socket.NotifyUser(parentTrack.UserId, message)
+	messageData := map[string]string{
+		"message": "🎵 Je hebt een nieuw verzoek voor een AudioTrack!",
+		"trackId": newAudioTrack.Id.Hex(), // Stuur de ID van de aangemaakte track
+	}
+
+	jsonMessage, err := json.Marshal(messageData)
+	if err != nil {
+		log.Println("❌ Error bij JSON conversie:", err)
+		return err
+	}
+
+	socket.NotifyUser(parentTrack.UserId, string(jsonMessage))
 
 	return c.JSON(http.StatusCreated, responses.AudioTrackResponse{Status: http.StatusCreated, Message: "success", Data: &echo.Map{"data": result}})
 
