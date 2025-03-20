@@ -30,7 +30,7 @@ export default function Navbar() {
 
     // ✅ Controleer of er een trackId is
     if (notification.trackId) {
-      router.push(`/tracks/request/${notification.trackId}`);
+      router.push(`/tracks/request/${notification.trackId}?notification=${notification.notificationId}`);
     } else {
       router.push("/");
     }

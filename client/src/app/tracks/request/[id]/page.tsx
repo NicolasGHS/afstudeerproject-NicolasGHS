@@ -2,19 +2,24 @@
 
 import { Button } from "@/components/ui/button";
 import { Pause, Play } from 'lucide-react';
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { getAllAudioTracksById, getAllPendingAudioTracksById } from "@/lib/tracks/api";
 import { useState, useEffect } from "react";
 import WaveSurfer from "wavesurfer.js";
 import AudioTrack from "@/components/AudioTrack";
+import { useWebSocket } from "@/contexts/WebSocketContext";
 
 const Request = () => {
     const [audioTracks, setAudioTracks] = useState([]);
     const [pendingTracks, setPendingTracks] = useState([]);
     const { id } = useParams();
+    const searchParams = useSearchParams();
+    const notificationId = searchParams.get("notification");
     const [players, setPlayers] = useState<WaveSurfer[]>([]);
     const [isPlaying, setIsPlaying] = useState(false);
     const pendingAudioTracks = pendingTracks.filter((track) => track.status === "pending").map((track) => track.id);
+
+    const { messages, removeMessage } = useWebSocket();
 
 
     const togglePlayAll = () => {
@@ -26,9 +31,9 @@ const Request = () => {
         setIsPlaying(!isPlaying);
     };
 
-    function removeNotification(trackId) {
+    function removeNotification(trackId, notificationId) {
         let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
-        notifications = notifications.filter(notification => notification.trackId !== trackId);
+        notifications = notifications.filter(notification => notification.notificationId !== notificationId);
         localStorage.setItem("notifications", JSON.stringify(notifications));
     }
     
@@ -61,7 +66,9 @@ const Request = () => {
                     )
                 );
                 
-                removeNotification(id);
+                if (notificationId) {
+                    removeMessage(Number(notificationId));
+                }
             
             } else {
                 console.error("Failed to accept tracks");
@@ -95,7 +102,9 @@ const Request = () => {
                     prevTracks.filter((track) => track.status !== "pending")
                 );
 
-                removeNotification(id);
+                if (notificationId) {
+                    removeMessage(Number(notificationId));
+                }
             } else {
                 console.error("Failed to decline tracks");
             }

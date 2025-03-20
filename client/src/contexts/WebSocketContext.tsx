@@ -41,8 +41,15 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         ws.onmessage = (event) => {
             try {
                 const newMessage = JSON.parse(event.data); // 🔹 Parse hier als object
+                
+                // add notification id
+                const messageWithId = {
+                  ...newMessage,
+                  notificationId: Date.now(),
+              };
+                
                 setMessages((prevMessages) => {
-                  const updatedMessages = [...prevMessages, newMessage]; 
+                  const updatedMessages = [...prevMessages, messageWithId]; 
                   localStorage.setItem("notifications", JSON.stringify(updatedMessages)); 
                   return updatedMessages;
                 });
@@ -66,13 +73,13 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
 
     console.log("message: ", messages);
 
-    const removeMessage = (index: number) => {
-        setMessages((prevMessages) => {
-          const updatedMessages = prevMessages.filter((_, i) => i !== index);
+    const removeMessage = (notificationId: number) => {
+      setMessages((prevMessages) => {
+          const updatedMessages = prevMessages.filter((message) => message.notificationId !== notificationId);
           localStorage.setItem("notifications", JSON.stringify(updatedMessages));
           return updatedMessages;
-        });
-    };
+      });
+  };
 
 
     return (
