@@ -1,11 +1,13 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { getUser } from "@/lib/users/api";
 
 const WebSocketContext = createContext(null);
 
 export const WebSocketProvider = ({ children }: { children: React.ReactNode }) => {
     // const [socket, setSocket] = useState<WebSocket | null>(null);
+    const [userId, setUserId] = useState();
     const [messages, setMessages] = useState<[]>(() => {
         // 🟢 Haal berichten uit localStorage bij laden
         if (typeof window !== "undefined") {
@@ -15,7 +17,21 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
       });
 
     useEffect(() => {
-        const userId = "67c5724248d6ae787976a326";
+      const fetchUser = async () => {
+        const user = await getUser();
+
+        setUserId(user.id);
+      }
+
+      fetchUser();
+    }, []);
+
+    console.log("userId: ", userId);
+
+    useEffect(() => {
+        // const testId = "67c5724248d6ae787976a326";
+        if (!userId) return;
+
         const ws = new WebSocket(`ws://localhost:8000/ws/${userId}`);
 
         ws.onopen = () => {
@@ -46,7 +62,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         return () => {
             ws.close();
         };
-    }, []);
+    }, [userId]);
 
     console.log("message: ", messages);
 
