@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Bell } from 'lucide-react';
-import { useWebSocket } from "../../contexts/WebSocketContext";
+// import { useWebSocket } from "../../contexts/WebSocketContext";
 import { useRouter } from "next/navigation";
 
 
 export default function Navbar() {
-  const { messages, removeMessage } = useWebSocket();
+  // const { messages, removeMessage } = useWebSocket();
+  const messages = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("notifications") || "[]") : [];
+
+  console.log("Messages from localStorage:", messages);
   const router = useRouter();
 
   const handleNotificationClick = (notificationString: string, index: number) => {
@@ -21,7 +24,7 @@ export default function Navbar() {
       notification = typeof notificationString === "string" ? JSON.parse(notificationString) : notificationString;
     } catch (error) {
       console.error("Fout bij het parsen van notificatie:", error);
-      router.push("/dashboard");
+      router.push("/");
       return;
     }
 
@@ -29,7 +32,7 @@ export default function Navbar() {
     if (notification.trackId) {
       router.push(`/tracks/request/${notification.trackId}`);
     } else {
-      router.push("/dashboard");
+      router.push("/");
     }
   };
   return (
@@ -113,9 +116,9 @@ export default function Navbar() {
                           onClick={() => handleNotificationClick(notification, index)}
                         >
                           {notification.message} {/* ✅ Correcte weergave */}
-                          <button onClick={() => removeMessage(index)} className="text-red-500">
+                          {/* <button onClick={() => removeMessage(index)} className="text-red-500">
                             x
-                          </button>
+                          </button> */}
                         </li>
                       );
                     })}
