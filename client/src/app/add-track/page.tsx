@@ -24,6 +24,7 @@ import { getUser } from "@/lib/users/api";
 import { getInstruments } from "@/lib/instruments/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createClient } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 import { z } from "zod";
 
 const addTrackFormSchema = z.object({
@@ -38,14 +39,14 @@ const addTrackFormSchema = z.object({
   key: z.string(),
   bpm: z.number(),
   genre: z.string(),
-  track: z.any().refine((file) => file instanceof File, {
-    message: "You must upload a valid file.",
-  }),
-  instruments: z.array(
-    z.object({
-      value: z.string(),
-    }),
-  ),
+  // track: z.any().refine((file) => file instanceof File, {
+  //   message: "You must upload a valid file.",
+  // }),
+  // instruments: z.array(
+  //   z.object({
+  //     value: z.string(),
+  //   }),
+  // ),
 });
 
 type AddTrackFormValues = z.infer<typeof addTrackFormSchema>;
@@ -60,23 +61,24 @@ const defaultValues: Partial<AddTrackFormValues> = {
   key: "D",
   bpm: 100,
   genre: "Techno",
-  instruments: [{ value: "Guitar" }],
+  // instruments: [{ value: "Guitar" }],
 };
 
 const AddTrack = () => {
+  const router = useRouter();
   const [tracks, setTracks] = useState([]);
   const [user, setUser] = useState();
-  console.log("tracks", tracks);
+  // console.log("tracks", tracks);
   const form = useForm<AddTrackFormValues>({
     resolver: zodResolver(addTrackFormSchema),
     defaultValues,
     mode: "onChange",
   });
 
-  const { fields, append } = useFieldArray({
-    name: "instruments",
-    control: form.control,
-  });
+  // const { fields, append } = useFieldArray({
+  //   name: "instruments",
+  //   control: form.control,
+  // });
 
   useEffect(() => {
     async function fetchInstruments() {
@@ -96,22 +98,22 @@ const AddTrack = () => {
     fetchUser();
   }, []);
 
-  async function uploadTrack(file: File) {
-    const filePath = `${Date.now()}_${file.name}`;
-    const { data, error } = await supabase.storage
-      .from("Tracks")
-      .upload(filePath, file);
+  // async function uploadTrack(file: File) {
+  //   const filePath = `${Date.now()}_${file.name}`;
+  //   const { data, error } = await supabase.storage
+  //     .from("Tracks")
+  //     .upload(filePath, file);
 
-    if (error) {
-      console.error("Error uploading file: ", error);
-      return null;
-    }
+  //   if (error) {
+  //     console.error("Error uploading file: ", error);
+  //     return null;
+  //   }
 
-    return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Tracks/${filePath}`;
-  }
+  //   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Tracks/${filePath}`;
+  // }
 
   async function onSubmit(data: AddTrackFormValues) {
-    console.log("data:", data);
+    console.log("Submitting form...", data);
 
     const bpm = parseInt(data.bpm.toString(), 10);
     if (isNaN(bpm)) {
@@ -119,11 +121,11 @@ const AddTrack = () => {
       return;
     }
 
-    const fileUrl = await uploadTrack(data.track);
-    if (!fileUrl) {
-      console.error("Failed to upload file to Supabase.");
-      return;
-    }
+    // const fileUrl = await uploadTrack(data.track);
+    // if (!fileUrl) {
+    //   console.error("Failed to upload file to Supabase.");
+    //   return;
+    // }
 
     try {
       // Add Track
@@ -143,6 +145,7 @@ const AddTrack = () => {
         }),
       });
 
+      console.log("trackResponse", trackResponse);
       // console.log("response: ", response.text());
 
       const requestBody = {
@@ -165,39 +168,40 @@ const AddTrack = () => {
 
       const trackId = trackResult?.data?.id;
 
-      console.log("TrackId: ", trackId);
+      // console.log("TrackId: ", trackId);
 
-      if (!trackId) {
-        throw new Error("TrackId not found");
-      }
+      // if (!trackId) {
+      //   throw new Error("TrackId not found");
+      // }
 
       // Add AudioTrack
-      const audioTrackResponse = await fetch(
-        "http://localhost:8000/audioTracks",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: data.name,
-            contributor: user?.id, // Dit kun je aanpassen aan je user-object
-            trackId: trackId,
-            trackUrl: fileUrl,
-            instrument: data.instruments.map((inst) => inst.value).join(", "), // Converteer array naar string
-          }),
-        },
-      );
+      // const audioTrackResponse = await fetch(
+      //   "http://localhost:8000/audioTracks",
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({
+      //       name: data.name,
+      //       contributor: user?.id, // Dit kun je aanpassen aan je user-object
+      //       trackId: trackId,
+      //       trackUrl: fileUrl,
+      //       instrument: data.instruments.map((inst) => inst.value).join(", "), // Converteer array naar string
+      //     }),
+      //   },
+      // );
 
-      if (!audioTrackResponse.ok) {
-        throw new Error(
-          `Error adding audioTrack: ${audioTrackResponse.status}`,
-        );
-      }
+      // if (!audioTrackResponse.ok) {
+      //   throw new Error(
+      //     `Error adding audioTrack: ${audioTrackResponse.status}`,
+      //   );
+      // }
 
-      console.log("AudioTrack added");
+      // console.log("AudioTrack added");
 
       form.reset();
+      router.push(`/tracks/edit/${trackId}`);
     } catch (error) {
       console.error("Failed to add track: ", error);
 
@@ -269,58 +273,6 @@ const AddTrack = () => {
             </FormItem>
           )}
         />
-        <div>
-          {fields.map((field, index) => (
-            <FormField
-              control={form.control}
-              key={field.id}
-              name={`instruments.${index}.value`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Instruments</FormLabel>
-                  <FormControl>
-                    {/* <Input {...field} /> */}
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="instrument" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {tracks?.map((track) => (
-                          <SelectItem key={track.id} value={track.name}>
-                            {track.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
-        </div>
-        <FormField
-          control={form.control}
-          name="track"
-          render={({ field: { onChange, ...field } }) => (
-            <FormItem>
-              <FormLabel>Track</FormLabel>
-              <FormControl>
-                <Input
-                  type="file"
-                  accept="audio/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] || null;
-                    console.log("Selected file:", file);
-                    onChange(file);
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <Button type="submit">Submit</Button>
       </form>
     </Form>

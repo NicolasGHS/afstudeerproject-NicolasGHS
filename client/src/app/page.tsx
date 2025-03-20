@@ -25,6 +25,7 @@ export default function Home() {
     fetchTracks();
   }, []);
 
+
   return (
     <div className="flex flex-col items-center w-full min-h-screen p-4">
       <UserInitializer />

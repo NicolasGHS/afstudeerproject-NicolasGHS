@@ -9,6 +9,8 @@ import { getUser } from "@/lib/users/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
+import { Pause, Play } from 'lucide-react';
+import { useRouter } from "next/navigation";
 import {
   Form,
   FormField,
@@ -49,6 +51,7 @@ const EditTrack = () => {
   const { id } = useParams();
   const [players, setPlayers] = useState<WaveSurfer[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const router = useRouter();
 
   const togglePlayAll = () => {
     if (isPlaying) {
@@ -100,7 +103,6 @@ const EditTrack = () => {
           contributor: user?.id,
           trackId: id,
           trackUrl: fileUrl,
-          status: "pending",
           instrument: data.instrument,
         }),
       });
@@ -113,6 +115,8 @@ const EditTrack = () => {
 
       console.log("AudioTrack added successfully!");
       form.reset();
+
+      router.push(`/tracks/${id}`);
 
       // Herlaad de audiotracks
       const updatedTracks = await getAudioTracksById(id);
@@ -154,7 +158,7 @@ const EditTrack = () => {
     <>
       {audioTracks.length > 0 && (
         <Button onClick={togglePlayAll} className="mt-4">
-          {isPlaying ? "Pause All" : "Play All"}
+          {isPlaying ? <Pause /> : <Play />}
         </Button>
       )}
       {audioTracks.length > 0 ? (
