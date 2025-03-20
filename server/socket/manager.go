@@ -1,10 +1,17 @@
 package socket
 
 import (
+	"context"
 	"fmt"
 	"sync"
+	"syncopate/configs"
+	"syncopate/models"
+	"time"
 
 	"github.com/gorilla/websocket"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var clients = make(map[string]*websocket.Conn)
@@ -16,6 +23,8 @@ func RegisterUser(userId string, conn *websocket.Conn) {
 	defer mu.Unlock()
 	clients[userId] = conn
 	fmt.Println("User registered:", userId)
+
+	go sendPendingNotifications(userId)
 }
 
 // UnregisterUser verwijdert de gebruiker bij disconnect
@@ -39,6 +48,60 @@ func NotifyUser(userId string, message string) {
 			UnregisterUser(userId) // Verwijder gebruiker bij fout
 		}
 	} else {
-		fmt.Println("User not connected:", userId)
+		saveNotification(userId, message)
+	}
+}
+
+func saveNotification(userId, message string) {
+	collection := configs.GetCollection(configs.DB, "notifications")
+
+	notification := models.Notification{
+		UserId:      userId,
+		Message:     message,
+		IsDelivered: false,
+		CreatedAt:   primitive.NewDateTimeFromTime(time.Now()),
+	}
+
+	_, err := collection.InsertOne(context.Background(), notification)
+	if err != nil {
+		fmt.Println("Error saving notification:", err)
+	}
+}
+
+func sendPendingNotifications(userId string) {
+	collection := configs.GetCollection(configs.DB, "notifications")
+
+	filter := bson.M{
+		"userId":      userId,
+		"isDelivered": false,
+	}
+
+	cursor, err := collection.Find(context.Background(), filter)
+	if err != nil {
+		fmt.Println("Error fetching pending notifications:", err)
+		return
+	}
+	defer cursor.Close(context.Background())
+
+	for cursor.Next(context.Background()) {
+		var notification models.Notification
+		if err := cursor.Decode(&notification); err != nil {
+			fmt.Println("Error decoding notification:", err)
+			continue
+		}
+
+		// Verstuur notificatie naar de gebruiker
+		conn, exists := clients[userId]
+		if exists {
+			conn.WriteMessage(websocket.TextMessage, []byte(notification.Message))
+
+			// Markeer notificatie als afgeleverd
+			collection.UpdateOne(
+				context.Background(),
+				bson.M{"_id": notification.Id},
+				bson.M{"$set": bson.M{"isDelivered": true}},
+				options.Update().SetUpsert(true),
+			)
+		}
 	}
 }
