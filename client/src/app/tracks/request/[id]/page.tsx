@@ -26,6 +26,13 @@ const Request = () => {
         setIsPlaying(!isPlaying);
     };
 
+    function removeNotification(trackId) {
+        let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
+        notifications = notifications.filter(notification => notification.trackId !== trackId);
+        localStorage.setItem("notifications", JSON.stringify(notifications));
+    }
+    
+
 
     const acceptTracks = async () => {
 
@@ -53,6 +60,9 @@ const Request = () => {
                         track.status === "pending" ? { ...track, status: "accepted" } : track
                     )
                 );
+                
+                removeNotification(id);
+            
             } else {
                 console.error("Failed to accept tracks");
             }
@@ -84,6 +94,8 @@ const Request = () => {
                 setAudioTracks((prevTracks) =>
                     prevTracks.filter((track) => track.status !== "pending")
                 );
+
+                removeNotification(id);
             } else {
                 console.error("Failed to decline tracks");
             }
