@@ -7,8 +7,10 @@ interface AudioPlayerContextType {
   isPlaying: boolean;
   currentTrack: string | null;
   currentArtist: string | null;
+  isPlayerVisible: boolean;
   playTrack: (trackId: string, trackName: string, artistId: string) => Promise<void>;
   togglePlay: () => void;
+  closePlayer: () => void;
 }
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(
@@ -20,6 +22,7 @@ export const AudioPlayerProvider = ({ children }: { children: React.ReactNode })
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<string | null>(null);
   const [currentArtist, setCurrentArtist] = useState<string | null>(null); 
+  const [isPlayerVisible, setIsPlayerVisible] = useState(false);
   const audioRefs = useRef<HTMLAudioElement[]>([]);
 
   const playTrack = async (trackId: string, trackName: string, artistId: string) => {
@@ -35,6 +38,7 @@ export const AudioPlayerProvider = ({ children }: { children: React.ReactNode })
       setCurrentTrack(trackName);
       setCurrentArtist(artistId);
       setIsPlaying(true);
+      setIsPlayerVisible(true);
 
       setTimeout(() => {
         audioUrls.forEach((track, index) => {
@@ -59,14 +63,27 @@ export const AudioPlayerProvider = ({ children }: { children: React.ReactNode })
     });
   };
 
+  const closePlayer = () => {
+    setIsPlaying(false);
+    setCurrentTrack(null);
+    setCurrentArtist(null);
+    setIsPlayerVisible(false); // 🔥 Verberg de PlayerBar
+    audioRefs.current.forEach((audio) => {
+      if (audio) audio.pause();
+    });
+  };
+
+
   return (
     <AudioPlayerContext.Provider
       value={{
         isPlaying,
         currentTrack,
+        isPlayerVisible,
         currentArtist,
         playTrack,
         togglePlay,
+        closePlayer,
       }}
     >
       {children}
