@@ -81,7 +81,7 @@ const Profile = () => {
                     <ul className="mt-2 space-y-1 mb-4">
                         {tracks.map((track) => (
                             <li key={track.id} className="text-lg">
-                                <p className="ml-2">{track.name}</p>
+                                <p className="ml-2 hover:underline">{track.name}</p>
                             </li>
                         ))}
                     </ul>
@@ -97,12 +97,12 @@ const Profile = () => {
                     <ul className="mt-2 space-y-1 mb-4">
                     {contributedTracks.map((track) => (
                         <li key={track.id} className="text-lg">
-                            <p className="ml-2">{track.name}</p>
+                            <p className="ml-2 hover:underline cursor-pointer">{track.name}</p>
                         </li>
                     ))}
                 </ul>
                 ) : (
-                    <p className="text-gray-500 mt-2 mb-4">No contributions found.</p>
+                    <p className="text-gray-500 mt-2 mb-4 cursor-pointer">No contributions found.</p>
                 )}
                 <Separator />
             </div>
