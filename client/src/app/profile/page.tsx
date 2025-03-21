@@ -58,27 +58,33 @@ const Profile = () => {
 
     return (
         <>
-            <Avatar className="w-28 h-28">
-                <AvatarImage src={user.imageUrl} />
-                <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-
-            <h1 className="text-4xl mb-4">{user?.username}</h1>
+            <div className="flex items-center gap-8 mb-4">
+                <Avatar className="w-28 h-28">
+                    <AvatarImage src={user.imageUrl} />
+                    <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                <h1 className="text-4xl mb-4">{user?.username}</h1>
+            </div>
             <Separator />
             <div>
+                <h2 className="mt-2 text-xl">Tracks</h2>
                 {tracks.length > 0 ? (
                     <ul className="mt-2 space-y-1 mb-4">
                         {tracks.map((track) => (
                             <li key={track.id} className="text-lg">
-                                {track.name}
+                                <p className="ml-2">{track.name}</p>
                             </li>
                         ))}
                     </ul>
                 ) : (
                     <p className="text-gray-500 mt-2 mb-4">No tracks found.</p>
-            )}
+                )}
 
-            <Separator />
+                <Separator />
+            </div>
+            <div>
+                <h2 className="mt-2 text-xl">Contributions</h2>
+                <Separator />
             </div>
         </>
     )
