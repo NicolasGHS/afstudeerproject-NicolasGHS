@@ -308,3 +308,50 @@ func GetTracksByUserId(c echo.Context) error {
 		Data:    &echo.Map{"data": tracks},
 	})
 }
+
+func GetTracksByContributor(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	userId := c.Param("userId") // Haal de userId op uit de request
+
+	if userId == "" {
+		return c.JSON(http.StatusBadRequest, responses.TrackResponse{
+			Status:  http.StatusBadRequest,
+			Message: "error",
+			Data:    &echo.Map{"data": "User ID is required"},
+		})
+	}
+
+	var tracks []models.Track
+
+	// Zoek tracks waar de userId in de contributors array staat
+	filter := bson.M{"contributors": userId}
+	cursor, err := trackCollection.Find(ctx, filter)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.TrackResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "error",
+			Data:    &echo.Map{"data": err.Error()},
+		})
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var track models.Track
+		if err := cursor.Decode(&track); err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.TrackResponse{
+				Status:  http.StatusInternalServerError,
+				Message: "error",
+				Data:    &echo.Map{"data": err.Error()},
+			})
+		}
+		tracks = append(tracks, track)
+	}
+
+	return c.JSON(http.StatusOK, responses.TrackResponse{
+		Status:  http.StatusOK,
+		Message: "success",
+		Data:    &echo.Map{"data": tracks},
+	})
+}

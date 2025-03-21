@@ -38,7 +38,7 @@ export async function getTracksByUser(userId: string) {
     if (response.ok) {
       const result = await response.json();
 
-      return result.data?.data;
+      return result.data?.data || [];
     } else {
       console.error("Failed to fetch tracks.");
     }
@@ -107,3 +107,18 @@ export async function getAllPendingAudioTracksById(id: string) {
     return [];
   }
 }
+
+export const getTracksByContributor = async (userId: string) => {
+  try {
+      const res = await fetch(`http://localhost:8000/tracks/contributor/${userId}`);
+      console.log("res", res);
+      if (!res.ok) {
+          throw new Error("Failed to fetch tracks");
+      }
+      const data = await res.json();
+      return data.data?.data || [];
+  } catch (error) {
+      console.error("Error fetching contributor tracks:", error);
+      return [];
+  }
+};
