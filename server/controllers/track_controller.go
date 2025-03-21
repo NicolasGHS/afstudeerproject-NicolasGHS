@@ -271,3 +271,40 @@ func GetPendingAudioTrackByTrackId(c echo.Context) error {
 	})
 
 }
+
+func GetTracksByUserId(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	userId := c.Param("userId")
+	var tracks []models.Track
+	defer cancel()
+
+	// Zoek alle tracks met de opgegeven userId
+	cursor, err := trackCollection.Find(ctx, bson.M{"userid": userId})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.TrackResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "error",
+			Data:    &echo.Map{"data": err.Error()},
+		})
+	}
+
+	// Itereer door de resultaten
+	defer cursor.Close(ctx)
+	for cursor.Next(ctx) {
+		var track models.Track
+		if err := cursor.Decode(&track); err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.TrackResponse{
+				Status:  http.StatusInternalServerError,
+				Message: "error",
+				Data:    &echo.Map{"data": err.Error()},
+			})
+		}
+		tracks = append(tracks, track)
+	}
+
+	return c.JSON(http.StatusOK, responses.TrackResponse{
+		Status:  http.StatusOK,
+		Message: "success",
+		Data:    &echo.Map{"data": tracks},
+	})
+}

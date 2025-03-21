@@ -29,6 +29,25 @@ export async function getTrackById(id: string) {
   }
 }
 
+export async function getTracksByUser(userId: string) {
+  try {
+    const response = await fetch(`http://localhost:8000/tracks/user/${userId}`);
+
+    console.log("response", response);
+
+    if (response.ok) {
+      const result = await response.json();
+
+      return result.data?.data;
+    } else {
+      console.error("Failed to fetch tracks.");
+    }
+  } catch (error) {
+    console.error("Failed to fetch tracks: ", error);
+    return [];
+  }
+}
+
 export async function getAudioTracksById(id: string) {
   try {
     const response = await fetch(

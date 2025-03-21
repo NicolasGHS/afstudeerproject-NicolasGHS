@@ -12,6 +12,7 @@ func TrackRoute(e *echo.Echo) {
 	e.GET("/tracks/audioTracks/:trackId", controllers.GetAcceptedAudioTrackByTrackId)
 	e.GET("/tracks/allAudioTracks/:trackId", controllers.GetAllAudioTracksByTrackId)
 	e.GET("/tracks/allPendingAudioTracks/:trackId", controllers.GetPendingAudioTrackByTrackId)
+	e.GET("/tracks/user/:userId", controllers.GetTracksByUserId)
 	e.POST("/tracks", controllers.CreateTrack)
 	e.PUT("/tracks/:trackId", controllers.EditTrack)
 	e.DELETE("/tracks/:trackId", controllers.DeleteTrack)
