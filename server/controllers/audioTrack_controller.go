@@ -191,6 +191,17 @@ func AcceptAudioTracks(c echo.Context) error {
 			})
 		}
 
+		// Haal de AudioTrack op
+		var audioTrack models.AudioTrack
+		err = audioTrackCollection.FindOne(ctx, bson.M{"id": trackObjectId}).Decode(&audioTrack)
+		if err != nil {
+			return c.JSON(http.StatusNotFound, responses.AudioTrackResponse{
+				Status:  http.StatusNotFound,
+				Message: "error",
+				Data:    &echo.Map{"data": "AudioTrack not found"},
+			})
+		}
+
 		update := bson.M{"$set": bson.M{"status": "accepted"}}
 		_, err = audioTrackCollection.UpdateOne(ctx, bson.M{"id": trackObjectId}, update)
 		if err != nil {
@@ -199,6 +210,48 @@ func AcceptAudioTracks(c echo.Context) error {
 				Message: "error",
 				Data:    &echo.Map{"data": err.Error()},
 			})
+		}
+
+		// Zoek de parent Track op
+		parentTrackId, err := primitive.ObjectIDFromHex(audioTrack.TrackId)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, responses.AudioTrackResponse{
+				Status:  http.StatusBadRequest,
+				Message: "error",
+				Data:    &echo.Map{"data": "Invalid Parent TrackId format"},
+			})
+		}
+
+		var parentTrack models.Track
+		err = trackCollection.FindOne(ctx, bson.M{"id": parentTrackId}).Decode(&parentTrack)
+		if err != nil {
+			return c.JSON(http.StatusNotFound, responses.AudioTrackResponse{
+				Status:  http.StatusNotFound,
+				Message: "error",
+				Data:    &echo.Map{"data": "Parent track not found"},
+			})
+		}
+
+		// Controleer of de contributor al in de lijst staat
+		exists := false
+		for _, contributor := range parentTrack.Contributors {
+			if contributor == audioTrack.Contributor {
+				exists = true
+				break
+			}
+		}
+
+		// Voeg de contributor toe als deze nog niet bestaat
+		if !exists {
+			updateParentTrack := bson.M{"$addToSet": bson.M{"contributors": audioTrack.Contributor}}
+			_, err = trackCollection.UpdateOne(ctx, bson.M{"id": parentTrackId}, updateParentTrack)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, responses.AudioTrackResponse{
+					Status:  http.StatusInternalServerError,
+					Message: "error",
+					Data:    &echo.Map{"data": err.Error()},
+				})
+			}
 		}
 	}
 
