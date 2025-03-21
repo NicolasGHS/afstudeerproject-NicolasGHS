@@ -39,7 +39,7 @@ const TrackCard = ({ trackId, track, artist, contributors, needs, genre, link }:
 
   const handlePlay = (event: React.MouseEvent) => {
     event.stopPropagation();
-    playTrack(trackId); // 🎵 Geef de track ID mee om audio op te halen
+    playTrack(trackId, track, artist);
   };
 
   const handleNavigate = () => {

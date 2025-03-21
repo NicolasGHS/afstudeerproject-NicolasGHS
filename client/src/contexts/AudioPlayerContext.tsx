@@ -5,7 +5,9 @@ import { getAudioTracksById } from "@/lib/tracks/api";
 
 interface AudioPlayerContextType {
   isPlaying: boolean;
-  playTrack: (trackId: string) => Promise<void>; // Speelt een track af op basis van ID
+  currentTrack: string | null;
+  currentArtist: string | null;
+  playTrack: (trackId: string, trackName: string, artistId: string) => Promise<void>;
   togglePlay: () => void;
 }
 
@@ -14,29 +16,26 @@ const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(
 );
 
 export const AudioPlayerProvider = ({ children }: { children: React.ReactNode }) => {
-  const [tracks, setTracks] = useState<string[]>([]); // Track URLs
+  const [tracks, setTracks] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioRefs = useRef<HTMLAudioElement[]>([]); // Audio-element refs
+  const [currentTrack, setCurrentTrack] = useState<string | null>(null);
+  const [currentArtist, setCurrentArtist] = useState<string | null>(null); 
+  const audioRefs = useRef<HTMLAudioElement[]>([]);
 
-
-  // 🎵 Functie om een track af te spelen op basis van ID
-  const playTrack = async (trackId: string) => {
-
-  console.log('trackId', trackId);
+  const playTrack = async (trackId: string, trackName: string, artistId: string) => {
     try {
-      const fetchedTracks = await getAudioTracksById(trackId); // Haal audio tracks op
-
-      console.log('Fetched tracks', fetchedTracks);
+      const fetchedTracks = await getAudioTracksById(trackId);
       if (!fetchedTracks || fetchedTracks.length === 0) {
         console.warn("No audio tracks found for this track.");
         return;
       }
 
-      const audioUrls = fetchedTracks.map((track: any) => track.trackUrl); // Extract URLs
+      const audioUrls = fetchedTracks.map((track: any) => track.trackUrl);
       setTracks(audioUrls);
+      setCurrentTrack(trackName);
+      setCurrentArtist(artistId);
       setIsPlaying(true);
 
-      // Start met afspelen
       setTimeout(() => {
         audioUrls.forEach((track, index) => {
           if (audioRefs.current[index]) {
@@ -44,17 +43,15 @@ export const AudioPlayerProvider = ({ children }: { children: React.ReactNode })
             audioRefs.current[index].play();
           }
         });
-      }, 100); // Even wachten om state updates te verwerken
+      }, 100);
 
     } catch (error) {
       console.error("Error playing track:", error);
     }
   };
 
-  // ⏯️ Toggle play/pause
   const togglePlay = () => {
     setIsPlaying((prev) => !prev);
-
     audioRefs.current.forEach((audio) => {
       if (audio) {
         isPlaying ? audio.pause() : audio.play();
@@ -63,9 +60,16 @@ export const AudioPlayerProvider = ({ children }: { children: React.ReactNode })
   };
 
   return (
-    <AudioPlayerContext.Provider value={{ isPlaying, playTrack, togglePlay }}>
+    <AudioPlayerContext.Provider
+      value={{
+        isPlaying,
+        currentTrack,
+        currentArtist,
+        playTrack,
+        togglePlay,
+      }}
+    >
       {children}
-      {/* 🎵 Dynamisch audio-elementen aanmaken */}
       {tracks.map((_, index) => (
         <audio key={index} ref={(el) => (audioRefs.current[index] = el!)} />
       ))}
