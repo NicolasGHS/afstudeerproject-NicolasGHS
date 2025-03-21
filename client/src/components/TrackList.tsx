@@ -11,6 +11,7 @@ export default function TrackList({ initialTracks }: { initialTracks: any[] }) {
           trackId={track.id}
           track={track.name}
           artist={track.userId}
+          contributors={track.contributors}
           genre={track.genre}
           link={`/tracks/${track.id}`}
           audioUrl={track.track}

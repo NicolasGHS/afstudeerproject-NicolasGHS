@@ -8,13 +8,14 @@ import { getUserById } from "@/lib/users/api";
 import { useEffect, useState } from "react";
 
 interface TrackProps {
-  trackId: string; // 📌 We gebruiken nu de ID in plaats van een enkele URL
+  trackId: string;
   track: string;
   artist: string;
   contributors?: string[];
   needs?: string[];
   genre: string;
   link: string;
+  audioUrl: string;
 }
 
 const TrackCard = ({ trackId, track, artist, contributors, needs, genre, link }: TrackProps) => {
@@ -36,6 +37,7 @@ const TrackCard = ({ trackId, track, artist, contributors, needs, genre, link }:
   }, [artist]);
 
   console.log('track id', trackId);
+  console.log('contributors', contributors);
 
   const handlePlay = (event: React.MouseEvent) => {
     event.stopPropagation();

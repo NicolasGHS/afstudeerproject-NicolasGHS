@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { Pause, Play } from 'lucide-react';
 import { useRouter } from "next/navigation";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 import {
   Form,
   FormField,
@@ -60,6 +62,29 @@ const EditTrack = () => {
       players.forEach((player) => player.play());
     }
     setIsPlaying(!isPlaying);
+  };
+
+  const exportFiles = async () => {
+    if (audioTracks.length === 0) {
+      alert("Geen audiobestanden om te exporteren.");
+      return;
+    }
+  
+    const zip = new JSZip();
+  
+    // Voeg elk audiobestand toe aan de ZIP
+    const promises = audioTracks.map(async (track) => {
+      const response = await fetch(track.trackUrl);
+      const blob = await response.blob();
+      zip.file(`${track.name}.wav`, blob);
+    });
+  
+    // Wacht tot alle bestanden zijn toegevoegd
+    await Promise.all(promises);
+  
+    // Genereer het ZIP-bestand en start de download
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    saveAs(zipBlob, `audio_tracks.zip`);
   };
 
   console.log("user", user);
@@ -161,6 +186,7 @@ const EditTrack = () => {
           {isPlaying ? <Pause /> : <Play />}
         </Button>
       )}
+      <Button onClick={exportFiles} className="mt-4">Export files</Button>
       {audioTracks.length > 0 ? (
         audioTracks.map((audioTrack) => (
           <div key={audioTrack.id} className="flex items-center space-x-4">
