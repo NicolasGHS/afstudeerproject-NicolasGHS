@@ -8,6 +8,7 @@ export default function TrackList({ initialTracks }: { initialTracks: any[] }) {
       {initialTracks.map((track) => (
         <TrackCard
           key={track.id}
+          trackId={track.id}
           track={track.name}
           artist={track.userId}
           genre={track.genre}
