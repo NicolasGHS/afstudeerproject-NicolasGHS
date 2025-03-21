@@ -22,6 +22,7 @@ const TrackCard = ({ trackId, track, artist, contributors, needs, genre, link }:
   const router = useRouter();
   const { playTrack } = useAudioPlayer();
   const [username, setUsername] = useState<string | null>(null);
+  const [contributorNames, setContributorNames] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -36,8 +37,27 @@ const TrackCard = ({ trackId, track, artist, contributors, needs, genre, link }:
     fetchUser();
   }, [artist]);
 
+  useEffect(() => {
+    const fetchContributors = async () => {
+      if (!contributors || contributors.length === 0) return;
+
+      try {
+        const names = await Promise.all(contributors.map(async (id) => {
+          const user = await getUserById(id);
+          return user.username;
+        }));
+
+        setContributorNames(names);
+      } catch (error) {
+        console.error("Failed to fetch contributors: ", error);
+      }
+    };
+
+    fetchContributors();
+  }, [contributors]);
+
   console.log('track id', trackId);
-  console.log('contributors', contributors);
+  console.log('contributors', contributorNames);
 
   const handlePlay = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -56,7 +76,7 @@ const TrackCard = ({ trackId, track, artist, contributors, needs, genre, link }:
       </Avatar>
       <div>
         <p>{track} - {username}</p>
-        <p>Contributors: {contributors?.join(", ") || "None"}</p>
+        <p>Contributors: {contributorNames.length > 0 ? contributorNames.join(", ") : "None"}</p>
       </div>
       <div>
         <p>Needs: {needs?.join(", ") || "None"}</p>
