@@ -1,6 +1,7 @@
 "use server";
 
 import { currentUser } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export const getUser = async () => {
   const clerkUser = await currentUser();
@@ -43,3 +44,18 @@ export const getUserByClerkId = async (clerkId: string) => {
     return null;
   }
 }
+
+export const getClerkUser = async (userId: string) => {
+  try {
+    const user = await clerkClient.users.getUser(userId);
+    console.log('user', user);
+    return {
+      id: user.id,
+      username: user.username || user.firstName || "Onbekend",
+      avatar: user.imageUrl,
+    };
+  } catch (error) {
+    console.error("Failed to fetch user:", error);
+    return null;
+  }
+};
