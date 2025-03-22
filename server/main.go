@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"syncopate/configs"
 	"syncopate/routes"
 	"syncopate/socket"
@@ -95,5 +96,10 @@ func main() {
 		return nil
 	})
 
-	e.Logger.Fatal(e.Start(":8000"))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000"
+	}
+
+	e.Logger.Fatal(e.Start(":" + port))
 }
