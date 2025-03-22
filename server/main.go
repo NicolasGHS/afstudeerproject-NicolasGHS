@@ -9,7 +9,6 @@ import (
 	"syncopate/socket"
 
 	"github.com/gorilla/websocket"
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -49,12 +48,17 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Geen .env bestand gevonden, gebruik standaardinstellingen")
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	fmt.Println("Geen .env bestand gevonden, gebruik standaardinstellingen")
+	// }
 
 	e := echo.New()
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000"
+	}
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:3000", "https://127.0.0.1:3000"},
@@ -102,11 +106,6 @@ func main() {
 		}
 		return nil
 	})
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8000"
-	}
 
 	e.Logger.Fatal(e.Start(":" + port))
 }
