@@ -32,7 +32,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         // const testId = "67c5724248d6ae787976a326";
         if (!userId) return;
 
-        const ws = new WebSocket(`ws://localhost:8000/ws/${userId}`);
+        const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_API_URL}/ws/${userId}`);
 
         ws.onopen = () => {
             console.log("✅ WebSocket connected");
@@ -61,7 +61,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         ws.onclose = () => {
             console.log("WebSocket connection closed");
             setTimeout(() => {
-                const newSocket = new WebSocket(`ws://localhost:8000/ws/${userId}`);
+                const newSocket = new WebSocket(`ws://${process.env.NEXT_PUBLIC_API_URL}/ws/${userId}`);
                 newSocket.onmessage = (event) => setMessages((prev) => [...prev, event.data]);
             }, 3000);
         };

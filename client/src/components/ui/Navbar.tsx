@@ -16,7 +16,7 @@ export default function Navbar() {
   console.log("Messages from localStorage:", messages);
   const router = useRouter();
 
-  const handleNotificationClick = (notificationString: string, index: number) => {
+  const handleNotificationClick = (notificationString: string) => {
     let notification;
 
     // ✅ Controleer of het een JSON-string is en parse alleen indien nodig

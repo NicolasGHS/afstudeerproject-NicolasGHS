@@ -3,6 +3,10 @@
 import { createContext, useContext, useState, useRef } from "react";
 import { getAudioTracksById } from "@/lib/tracks/api";
 
+interface AudioTrack {
+  trackUrl: string;
+}
+
 interface AudioPlayerContextType {
   isPlaying: boolean;
   currentTrack: string | null;
@@ -27,13 +31,13 @@ export const AudioPlayerProvider = ({ children }: { children: React.ReactNode })
 
   const playTrack = async (trackId: string, trackName: string, artistId: string) => {
     try {
-      const fetchedTracks = await getAudioTracksById(trackId);
+      const fetchedTracks: AudioTrack[] = await getAudioTracksById(trackId);
       if (!fetchedTracks || fetchedTracks.length === 0) {
         console.warn("No audio tracks found for this track.");
         return;
       }
 
-      const audioUrls = fetchedTracks.map((track: any) => track.trackUrl);
+      const audioUrls = fetchedTracks.map((track) => track.trackUrl);
       setTracks(audioUrls);
       setCurrentTrack(trackName);
       setCurrentArtist(artistId);

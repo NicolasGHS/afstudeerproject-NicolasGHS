@@ -6,18 +6,10 @@ import {
   FormItem,
   FormLabel,
   FormControl,
-  FormDescription,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/users/api";
@@ -51,10 +43,10 @@ const addTrackFormSchema = z.object({
 
 type AddTrackFormValues = z.infer<typeof addTrackFormSchema>;
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
+// const supabase = createClient(
+//   process.env.NEXT_PUBLIC_SUPABASE_URL!,
+//   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+// );
 
 const defaultValues: Partial<AddTrackFormValues> = {
   name: "Track name",
@@ -66,7 +58,7 @@ const defaultValues: Partial<AddTrackFormValues> = {
 
 const AddTrack = () => {
   const router = useRouter();
-  const [tracks, setTracks] = useState([]);
+  // const [tracks, setTracks] = useState([]);
   const [user, setUser] = useState();
   // console.log("tracks", tracks);
   const form = useForm<AddTrackFormValues>({
@@ -81,10 +73,10 @@ const AddTrack = () => {
   // });
 
   useEffect(() => {
-    async function fetchInstruments() {
-      const data = await getInstruments();
-      setTracks(data);
-    }
+    // async function fetchInstruments() {
+    //   const data = await getInstruments();
+    //   setTracks(data);
+    // }
 
     async function fetchUser() {
       const user = await getUser();
@@ -94,7 +86,7 @@ const AddTrack = () => {
       setUser(user);
     }
 
-    fetchInstruments();
+    // fetchInstruments();
     fetchUser();
   }, []);
 
@@ -129,7 +121,7 @@ const AddTrack = () => {
 
     try {
       // Add Track
-      const trackResponse = await fetch("http://localhost:8000/tracks", {
+      const trackResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tracks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

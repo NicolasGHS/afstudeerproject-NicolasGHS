@@ -13,7 +13,7 @@ export const getUser = async () => {
 
 export const getUserById = async (id: string) => {
   try {
-    const response = await fetch(`http://localhost:8000/users/${id}`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`);
 
     if (response.ok) {
       const result = await response.json();
@@ -30,7 +30,7 @@ export const getUserById = async (id: string) => {
 
 export const getUserByClerkId = async (clerkId: string) => {
   try {
-    const response = await fetch(`http://localhost:8000/users/clerk/${clerkId}`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/clerk/${clerkId}`);
 
     if (!response.ok) {
       console.error(`Failed to fetch user with ClerkId ${clerkId}. Status: ${response.status}`);

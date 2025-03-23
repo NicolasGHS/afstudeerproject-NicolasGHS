@@ -7,7 +7,7 @@ const useWebSocket = (userId: string) => {
         if (!userId) return; // Wacht tot userId geladen is
       
         console.log("WebSocket verbinden met userId:", userId);
-        const ws = new WebSocket(`ws://localhost:8000/ws?userId=${userId}`);
+        const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_API_URL}/ws?userId=${userId}`);
       
         ws.onopen = () => console.log("WebSocket verbinding geopend!");
 

@@ -3,7 +3,7 @@
 import { getTracks } from "@/lib/tracks/api";
 import Searchbar from "@/components/Searchbar";
 import TrackList from "@/components/TrackList";
-import AddButton from "@/components/AddButton";
+// import AddButton from "@/components/AddButton";
 import { useEffect, useState } from "react";
 import UserInitializer from "@/lib/users/UserInitializer";
 

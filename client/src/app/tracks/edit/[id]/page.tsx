@@ -19,7 +19,6 @@ import {
   FormItem,
   FormLabel,
   FormControl,
-  FormDescription,
   FormMessage,
 } from "@/components/ui/form";
 import {
@@ -118,7 +117,7 @@ const EditTrack = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/audioTracks", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/audioTracks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

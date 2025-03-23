@@ -1,6 +1,6 @@
 export async function getInstruments() {
   try {
-    const response = await fetch("http://localhost:8000/instruments");
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/instruments`);
 
     if (!response.ok) throw new Error(`Error: ${response.status}`);
 
@@ -14,7 +14,7 @@ export async function getInstruments() {
 
 export async function getInstrumentById(id: string) {
   try {
-    const response = await fetch(`http://localhost:8000/instruments/${id}`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/instruments/${id}`);
 
     if (response.ok) {
       const result = await response.json();

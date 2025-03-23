@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import WaveSurfer from "wavesurfer.js";
 
 const AudioTrack = ({
   src,
-  name,
-  instrument,
   registerPlayer,
 }: {
   src: string;

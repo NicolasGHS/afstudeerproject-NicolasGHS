@@ -1,6 +1,6 @@
 export async function getTracks() {
   try {
-    const response = await fetch("http://localhost:8000/tracks");
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tracks`);
     if (!response.ok) throw new Error(`Error: ${response.status}`);
 
     const result = await response.json();
@@ -14,7 +14,7 @@ export async function getTracks() {
 
 export async function getTrackById(id: string) {
   try {
-    const response = await fetch(`http://localhost:8000/tracks/${id}`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tracks/${id}`);
 
     if (response.ok) {
       const result = await response.json();
@@ -31,7 +31,7 @@ export async function getTrackById(id: string) {
 
 export async function getTracksByUser(userId: string) {
   try {
-    const response = await fetch(`http://localhost:8000/tracks/user/${userId}`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tracks/user/${userId}`);
 
     console.log("response", response);
 
@@ -51,7 +51,7 @@ export async function getTracksByUser(userId: string) {
 export async function getAudioTracksById(id: string) {
   try {
     const response = await fetch(
-      `http://localhost:8000/tracks/audioTracks/${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/tracks/audioTracks/${id}`,
     );
 
     if (response.ok) {
@@ -71,7 +71,7 @@ export async function getAudioTracksById(id: string) {
 export async function getAllAudioTracksById(id: string) {
   try {
     const response = await fetch(
-      `http://localhost:8000/tracks/allAudioTracks/${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/tracks/allAudioTracks/${id}`,
     );
 
     if (response.ok) {
@@ -91,7 +91,7 @@ export async function getAllAudioTracksById(id: string) {
 export async function getAllPendingAudioTracksById(id: string) {
   try {
     const response = await fetch(
-      `http://localhost:8000/tracks/allPendingAudioTracks/${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/tracks/allPendingAudioTracks/${id}`,
     );
 
     if (response.ok) {
@@ -110,7 +110,7 @@ export async function getAllPendingAudioTracksById(id: string) {
 
 export const getTracksByContributor = async (userId: string) => {
   try {
-      const res = await fetch(`http://localhost:8000/tracks/contributor/${userId}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tracks/contributor/${userId}`);
       console.log("res", res);
       if (!res.ok) {
           throw new Error("Failed to fetch tracks");

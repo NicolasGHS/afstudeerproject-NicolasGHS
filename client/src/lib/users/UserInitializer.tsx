@@ -13,7 +13,7 @@ export default function UserInitializer() {
       const username = user.username
 
       if (email) {
-        fetch("http://localhost:8000/users", {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

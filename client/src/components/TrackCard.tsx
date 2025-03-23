@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
-import { getUserById, getClerkUser } from "@/lib/users/api";
+import { getUserById } from "@/lib/users/api";
 import { useEffect, useState } from "react";
 import {
   Dialog,

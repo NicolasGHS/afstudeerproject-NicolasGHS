@@ -19,7 +19,8 @@ const Request = () => {
     const [isPlaying, setIsPlaying] = useState(false);
     const pendingAudioTracks = pendingTracks.filter((track) => track.status === "pending").map((track) => track.id);
 
-    const { messages, removeMessage } = useWebSocket();
+    // const { messages, removeMessage } = useWebSocket();
+    const { removeMessage } = useWebSocket();
 
 
     const togglePlayAll = () => {
@@ -31,11 +32,11 @@ const Request = () => {
         setIsPlaying(!isPlaying);
     };
 
-    function removeNotification(trackId, notificationId) {
-        let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
-        notifications = notifications.filter(notification => notification.notificationId !== notificationId);
-        localStorage.setItem("notifications", JSON.stringify(notifications));
-    }
+    // function removeNotification(trackId, notificationId) {
+    //     let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
+    //     notifications = notifications.filter(notification => notification.notificationId !== notificationId);
+    //     localStorage.setItem("notifications", JSON.stringify(notifications));
+    // }
     
 
 
@@ -47,7 +48,7 @@ const Request = () => {
         }
 
         try {
-            const response = await fetch("http://localhost:8000/audioTracks/accept", {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/audioTracks/accept`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -85,7 +86,7 @@ const Request = () => {
         }
     
         try {
-            const response = await fetch("http://localhost:8000/audioTracks/decline", {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/audioTracks/decline`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,7 +1,16 @@
 import TrackCard from "./TrackCard";
 
-export default function TrackList({ initialTracks }: { initialTracks: any[] }) {
+interface Track {
+  id: string;
+  name: string;
+  userId: string;
+  contributors?: string[];
+  genre: string;
+  track: string;
+}
 
+
+export default function TrackList({ initialTracks }: { initialTracks: Track[] }) {
 
   return (
     <div className="w-full flex flex-col items-center gap-5">
