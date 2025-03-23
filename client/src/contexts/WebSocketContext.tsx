@@ -32,7 +32,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         // const testId = "67c5724248d6ae787976a326";
         if (!userId) return;
 
-        const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_API_URL}/ws/${userId}`);
+        const ws = new WebSocket(`wss://afstudeerproject-nicolasghs.onrender.com/ws/${userId}`);
 
         ws.onopen = () => {
             console.log("✅ WebSocket connected");
