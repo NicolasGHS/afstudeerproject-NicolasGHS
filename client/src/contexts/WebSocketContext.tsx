@@ -20,7 +20,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
       const fetchUser = async () => {
         const user = await getUser();
 
-        setUserId(user.id);
+        setUserId(user?.id);
       }
 
       fetchUser();
@@ -61,7 +61,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         ws.onclose = () => {
             console.log("WebSocket connection closed");
             setTimeout(() => {
-                const newSocket = new WebSocket(`ws://${process.env.NEXT_PUBLIC_API_URL}/ws/${userId}`);
+                const newSocket = new WebSocket(`wss://afstudeerproject-nicolasghs.onrender.com/ws/${userId}`);
                 newSocket.onmessage = (event) => setMessages((prev) => [...prev, event.data]);
             }, 3000);
         };
