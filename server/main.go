@@ -61,8 +61,9 @@ func main() {
 	}
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000", "https://127.0.0.1:3000", "https://afstudeerproject-nicolas-ghs.vercel.app/"},
+		AllowOrigins: []string{"http://localhost:3000", "https://127.0.0.1:3000", "https://afstudeerproject-nicolas-ghs.vercel.app"},
 		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+		AllowHeaders: []string{"Content-Type", "Authorization"},
 	}))
 
 	e.GET("/", func(c echo.Context) error {
