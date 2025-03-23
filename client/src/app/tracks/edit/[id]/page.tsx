@@ -181,11 +181,12 @@ const EditTrack = () => {
   return (
     <>
       {audioTracks.length > 0 && (
-        <Button onClick={togglePlayAll} className="mt-4">
-          {isPlaying ? <Pause /> : <Play />}
-        </Button>
+        <div className="flex justify-center mt-4 mb-8">
+          <Button onClick={togglePlayAll} className="w-16">
+            {isPlaying ? <Pause /> : <Play />}
+          </Button>
+        </div>
       )}
-      <Button onClick={exportFiles} className="mt-4">Export files</Button>
       {audioTracks.length > 0 ? (
         audioTracks.map((audioTrack) => (
           <div key={audioTrack.id} className="flex items-center space-x-4">
@@ -206,6 +207,8 @@ const EditTrack = () => {
       ) : (
         <p>Geen audio tracks gevonden.</p>
       )}
+      <Button onClick={exportFiles} className="mt-4">Export files</Button>
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-2">
           {/* Instrument selecteren */}

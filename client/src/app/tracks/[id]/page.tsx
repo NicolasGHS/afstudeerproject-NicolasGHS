@@ -85,7 +85,7 @@ const Track = () => {
             ))}
         </ul>
       </div>
-      <Button>
+      <Button className="mt-4">
         <Link href={`/tracks/edit/${track.id}`}>Edit Track</Link>
       </Button>
     </div>
