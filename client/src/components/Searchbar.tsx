@@ -6,7 +6,7 @@ export default function Searchbar({ searchTerm, setSearchTerm }) {
   };
 
   return (
-    <div className="flex items-center w-full mb-10 max-w-sm space-x-2 rounded-lg border border-gray-300 bg-gray-50 dark:bg-gray-900 px-3.5 py-2">
+    <div className="flex items-center w-full max-w-sm space-x-2 rounded-lg border border-gray-300 px-3.5 py-2">
       <SearchIcon className="h-4 w-4" />
       <Input
         type="search"
