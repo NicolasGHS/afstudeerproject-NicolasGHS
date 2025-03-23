@@ -87,19 +87,19 @@ const TrackCard = ({ trackId, track, artist, contributors, needs, genre, link }:
       </Avatar>
       <div>
         <div className="flex items-center gap-2" onClick={handleNavigate}>
-          <p className="hover:underline">{track}</p>
+          <p className="hover:underline text-l">{track}</p>
           <p>-</p>
-          <p className="hover:underline">{username}</p>
+          <p className="hover:underline text-gray-400">{username}</p>
         </div>
         <p className="flex items-center gap-2">
           {contributorUsers.slice(0, 3).map((c, i) => (
-            <span key={i} className="flex items-center">
+            <span key={i} className="flex items-center text-gray-400 text-sm">
               {c.username}
             </span>
           ))}
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}> {/* Track dialog open state */}
-            <DialogTrigger onClick={(e) => e.stopPropagation()} className="hover:underline">
+            <DialogTrigger onClick={(e) => e.stopPropagation()} className="hover:underline text-gray-400 text-sm">
               {contributorUsers.length > 3 && ` +${contributorUsers.length - 3} meer`}
             </DialogTrigger>
             <DialogContent>
@@ -128,9 +128,9 @@ const TrackCard = ({ trackId, track, artist, contributors, needs, genre, link }:
         </p>
       </div>
       <div>
-        <p>Needs: {needs?.join(", ") || "None"}</p>
+        <p className="text-gray-400">Needs: {needs?.join(", ") || "None"}</p>
       </div>
-      <p>{genre}</p>
+      <p className="text-gray-400">{genre}</p>
       <Button onClick={handlePlay}>
         <Play />
       </Button>

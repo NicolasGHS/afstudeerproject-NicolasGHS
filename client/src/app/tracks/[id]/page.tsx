@@ -4,14 +4,30 @@ import { useEffect, useState } from "react";
 import { getTrackById } from "@/lib/tracks/api";
 import { getUserById } from "@/lib/users/api";
 import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
+
+interface Track {
+  id: string;
+  name: string;
+  key: string;
+  bpm: string;
+  genre: string;
+  instruments: string[];
+}
+
+interface User {
+  id: string;
+  username: string;
+}
 
 const Track = () => {
   const params = useParams();
   const { id } = params;
-  const [track, setTrack] = useState();
-  const [user, setUser] = useState();
+  const [track, setTrack] = useState<Track>();
+  const [user, setUser] = useState<User>();
 
   useEffect(() => {
     const fetchTrack = async (id: string) => {
@@ -43,29 +59,35 @@ const Track = () => {
   if (!track) return <p>Loading...</p>;
 
   return (
-    <div className="flex flex-col items-center">
-      <h1 className="text-center font-bold text-xl">{track.name}</h1>
-      <p>{user?.email}</p>
-      <div className="grid grid-cols-2 gap-x-2 items-start">
-        <div className="flex flex-col gap-1 text-right">
-          <p>Key:</p>
-          <p>Bpm:</p>
-          <p>Genre:</p>
-          <p>Instruments:</p>
-        </div>
-        <div className="flex flex-col gap-1">
-          <p>{track.key}</p>
-          <p>{track.bpm}</p>
-          <p>{track.genre}</p>
-          <ul className="list-none m-0 p-0">
-            {track.instruments &&
-              track.instruments.map((instrument, index) => (
-                <li key={index}>{instrument}</li>
-              ))}
-          </ul>
-        </div>
+    <div className="flex flex-col items-center min-h-screen p-6">
+      <h1 className="text-3xl">{track.name}</h1>
+      <p className="mb-6 text-xl text-gray-200">{user?.username}</p>
+      <div className="flex gap-4 mb-4">
+        <p className="w-12">Key</p>
+        <p>{track.key}</p>
       </div>
-      <Link href={`/tracks/edit/${track.id}`}>Edit Track</Link>
+      <Separator className="w-3/4"/>
+      <div className="flex gap-4 mb-4 mt-4">
+        <p className="w-12">Bpm</p>
+        <p>{track.bpm}</p>
+      </div>
+      <Separator className="w-3/4" />
+      <div className="flex gap-4 mb-4 mt-4">
+        <p className="w-12">Genre</p>
+        <p>{track.genre}</p>
+      </div>
+      <Separator className="w-3/4" />
+      <div className="mt-4">
+        <ul className="list-none m-0 p-0">
+          {track.instruments &&
+            track.instruments.map((instrument, index) => (
+              <li key={index}>{instrument}</li>
+            ))}
+        </ul>
+      </div>
+      <Button>
+        <Link href={`/tracks/edit/${track.id}`}>Edit Track</Link>
+      </Button>
     </div>
   );
 };
