@@ -190,7 +190,7 @@ const EditTrack = () => {
         audioTracks.map((audioTrack) => (
           <div key={audioTrack.id} className="flex items-center space-x-4">
             <div className="w-32 flex flex-col items-center justify-center text-center">
-              <p>{audioTrack.name}</p>
+              {/* <p>{audioTrack.name}</p> */}
               <p>{audioTrack.instrument}</p>
             </div>
             <AudioTrack
